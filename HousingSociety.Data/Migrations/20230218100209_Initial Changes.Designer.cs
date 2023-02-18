@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HousingSociety.Data.Migrations
 {
     [DbContext(typeof(HousingSocietyDbContext))]
-    [Migration("20230129102044_Changing Aadhar as Nullable")]
-    partial class ChangingAadharasNullable
+    [Migration("20230218100209_Initial Changes")]
+    partial class InitialChanges
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -26,11 +26,11 @@ namespace HousingSociety.Data.Migrations
 
             modelBuilder.Entity("HousingSociety.Domain.Flat", b =>
                 {
-                    b.Property<int>("FlatNo")
+                    b.Property<int>("FlatId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FlatNo"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FlatId"), 1L, 1);
 
                     b.Property<long?>("AAdhar")
                         .HasColumnType("bigint");
@@ -49,11 +49,16 @@ namespace HousingSociety.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
                     b.Property<string>("Wing")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("FlatNo");
+                    b.HasKey("FlatId");
 
                     b.ToTable("Flats");
                 });
@@ -83,10 +88,10 @@ namespace HousingSociety.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TransactionId"), 1L, 1);
 
-                    b.Property<int>("FlatNo")
+                    b.Property<int>("FlatId")
                         .HasColumnType("int");
 
-                    b.Property<int>("MaintenaceId")
+                    b.Property<int>("MaintenanceId")
                         .HasColumnType("int");
 
                     b.Property<int>("TransactionAmount")
@@ -97,7 +102,30 @@ namespace HousingSociety.Data.Migrations
 
                     b.HasKey("TransactionId");
 
+                    b.HasIndex("FlatId");
+
+                    b.HasIndex("MaintenanceId");
+
                     b.ToTable("Transactions");
+                });
+
+            modelBuilder.Entity("HousingSociety.Domain.Transaction", b =>
+                {
+                    b.HasOne("HousingSociety.Domain.Flat", "Flat")
+                        .WithMany()
+                        .HasForeignKey("FlatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HousingSociety.Domain.Maintenance", "Maintenance")
+                        .WithMany()
+                        .HasForeignKey("MaintenanceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Flat");
+
+                    b.Navigation("Maintenance");
                 });
 #pragma warning restore 612, 618
         }

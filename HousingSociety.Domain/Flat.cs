@@ -5,7 +5,7 @@ namespace HousingSociety.Domain
     public class Flat
     {
         [Key]
-        public int FlatNo { get; set; }
+        public int FlatId { get; set; }
 
         //Default conventions
 
